@@ -17,45 +17,44 @@ module.exports.userDetails = async (req, res) => {
     );
     let userObj = {
       mobile_number: mobile_number,
-      otp: ONETIME,
+      otp: otp,
     };
 
-    
     if (userInfo != 0) {
       var user = await ConnectionUtil(
         `SELECT * FROM users WHERE mobile_number='${mobile_number}'`
       );
-      console.log(user,"****")
-      if(userInfo.isActive != 0){
-      let changeOtp = await ConnectionUtil(
-        `update users set otp='${otp}' where mobile_number='${mobile_number}'`
-      );
-      console.log(changeOtp,"TTTT")
-      const payload = {
-        id: user[0].id,
-        mobile_number: user[0].mobile_number,
-        businessName: user[0].businessName,
-        businessCategory: user[0].businessCategory,
-        address: user[0].address,
-        photo: user[0].photo,
-        storeLink: user[0].storeLink,
-      };
-      console.log(payload,"%%%%%")
-      const token = await issueJWT(payload);
-      user[0].tokens = token;
-      res.status(200).json({
-        error: 0,
-        success: true,
-        message: "successfully over written",
-        data: user[0],
-      })
-    } else {
-      return res.status(200).json({
-        success: false,
-        message:" user is not verified"
-      })
+      console.log(user, "****");
+      if (userInfo.isActive != 0) {
+        let changeOtp = await ConnectionUtil(
+          `update users set otp='${otp}' where mobile_number='${mobile_number}'`
+        );
+        console.log(changeOtp, "TTTT");
+        const payload = {
+          id: user[0].id,
+          mobile_number: user[0].mobile_number,
+          businessName: user[0].businessName,
+          businessCategory: user[0].businessCategory,
+          address: user[0].address,
+          photo: user[0].photo,
+          storeLink: user[0].storeLink,
+        };
+        console.log(payload, "%%%%%");
+        const token = await issueJWT(payload);
+        user[0].tokens = token;
+        res.status(200).json({
+          error: 0,
+          success: true,
+          message: "successfully over written",
+          data: user[0],
+        });
+      } else {
+        return res.status(200).json({
+          success: false,
+          message: " user is not verified",
+        });
       }
-    } else  {
+    } else {
       var insertDetails = await ConnectionUtil(
         `insert into users set?`,
         userObj
@@ -116,7 +115,7 @@ module.exports.verifyOwner = async (req, res) => {
 // module.exports.ProfileAdd = async (req, res) => {
 //   try {
 //     let pictureAdd = req.file
-//     console.log(pictureAdd, "details......")  
+//     console.log(pictureAdd, "details......")
 //     let { id } = req.user
 //     console.log("id.....",id)
 //     let addUser = await ConnectionUtil(`select * from users where id='${id}'`)
@@ -375,7 +374,7 @@ module.exports.updateProduct = async (req, res) => {
 module.exports.productProfile = async (req, res) => {
   try {
     let { id } = req.params;
-    var user_id = req.user.id;
+    var user_id = req.user;
     var user = await ConnectionUtil(
       `select * from products where user_id='${user_id}' and id=?`,
       id
@@ -1209,14 +1208,14 @@ module.exports.acceptOrderCust = async (req, res) => {
   try {
     // status = 8 means order is accepted
     var { id } = req.user;
-    console.log(id,"&&")
+    console.log(id, "&&");
     let order_id = req.params.order_id;
     //let product_id = req.params.id;
-    console.log(order_id,"PPP")
+    console.log(order_id, "PPP");
     var orderAcceptQuery = await ConnectionUtil(
       `select * from ordercustomers where id='${id}' and order_id='${order_id}'`
     );
-    console.log(orderAcceptQuery)
+    console.log(orderAcceptQuery);
     if (orderAcceptQuery.id != 0) {
       let providing = await ConnectionUtil(
         `update ordercustomers set 
@@ -1257,7 +1256,7 @@ module.exports.updateOrderCustomer = async (req, res) => {
       isCancel,
       isFailed,
       isDelivered,
-      isModified
+      isModified,
     } = req.body;
     let { id } = req.params;
     console.log(id, "$$$");
